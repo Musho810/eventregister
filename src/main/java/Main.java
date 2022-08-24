@@ -1,25 +1,23 @@
 import command.Command;
-import managers.EventManager;
-import managers.UserManager;
+import manager.EventManager;
+import manager.UserManager;
 import model.Event;
 import model.EventType;
 import model.User;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.Objects;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Scanner;
-
-import static dateUtil.DateUtil.stringToDate;
-import static model.EventType.*;
 
 public class Main implements Command {
     private static final Scanner scanner = new Scanner(System.in);
+    private static final UserManager userManager = new UserManager();
+    private static final EventManager eventManager = new EventManager();
+    private static SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd HH:mm:ss");
 
-
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
 
 
         boolean run = true;
@@ -37,10 +35,7 @@ public class Main implements Command {
                 case ADD_USER -> addUser();
                 case SHOW_ALL_EVENTS -> showAllEvents();
                 case SHOW_ALL_USERS -> showAllUsers();
-                case FIND_EVENT_BY_NAME -> findEventByName();
-                case FIND_USER_BY_EMAIL -> findUserByEmail();
-                case EXPORT_ALL_EVENTS_IN_EXCELL -> eventExell();
-                case EXPORT_ALL_USERS_IN_EXCELL -> userExcell();
+
                 default -> System.out.println("Invalid command");
             }
 
@@ -48,108 +43,70 @@ public class Main implements Command {
 
     }
 
-    private static void userExcell() {
-        UserManager userManager = new UserManager();
-        System.out.println("Please input file location");
-        String fileDir = scanner.nextLine();
-        try {
-            userManager.writeUsersToExcel(fileDir);
 
-        } catch (IOException | InvalidFormatException | SQLException e) {
-            e.printStackTrace();
+    private static void showAllUsers() {
+        List<User> all = userManager.getAll();
+        for (User user : all) {
+            System.out.println(user);
         }
+
     }
 
-    private static void eventExell() {
-        EventManager eventManager = new EventManager();
-        System.out.println("Please input file location");
-        String fileDir = scanner.nextLine();
-        try {
-            eventManager.writeEventsToExcel(fileDir);
+    private static void showAllEvents() {
 
-        } catch (IOException | InvalidFormatException | SQLException e) {
-            e.printStackTrace();
+        List<Event> all = eventManager.getAll();
+        for (Event event : all) {
+            System.out.println(event);
         }
+
     }
 
 
-    private static void findUserByEmail() throws SQLException {
-        UserManager userManager = new UserManager();
-        System.out.println("Please input user email");
-        String mailUser = scanner.nextLine();
-        userManager.findByEmail(mailUser);
+    private static void addEvent() {
+
+        System.out.println("Please input event name, place,price, isOnline,eventType,date (YYYY-MM-DD HH:MM:SS)");
+        String eventDataStr = scanner.nextLine();
+        String[] eventData = eventDataStr.split(",");
+        Event event = null;
+        try {
+            event = Event.builder()
+                    .name(eventData[0])
+                    .place(eventData[1])
+                    .price(Double.parseDouble(eventData[2]))
+                    .isOnline(Boolean.parseBoolean(eventData[3]))
+                    .eventType(EventType.valueOf(eventData[4]))
+                    .eventDate(sdf.parse(eventData[5]))
+                    .build();
+            eventManager.add(event);
+            System.out.println("Event added");
+        } catch (ParseException e) {
+            System.out.println("Invalid date format");
+        }
+
     }
 
-    private static void findEventByName() throws SQLException {
-        EventManager eventManager = new EventManager();
-        System.out.println("Please input event name");
-        String nameEvent = scanner.nextLine();
-        eventManager.findEventByName(nameEvent);
-    }
-
-    private static void showAllUsers() throws SQLException {
-        UserManager userManager = new UserManager();
-        userManager.showUsers();
-    }
-
-    private static void addUser() throws SQLException {
-        System.out.println("Please input user name");
-        String username = scanner.nextLine();
-        System.out.println("Please input user surname");
-        String usersurname = scanner.nextLine();
-        System.out.println("Please input user email ");
-        String useremail = scanner.nextLine();
-        System.out.println("Please choose event id");
+    private static void addUser() {
         showAllEvents();
-        int eventid = Integer.parseInt(scanner.nextLine());
+        System.out.println("Please choose event`s id");
+        int eventId = Integer.parseInt(scanner.nextLine());
+        Event event = eventManager.getById(eventId);
+        if (event == null) {
+            System.out.println("Please choose correct event Id");
+        } else {
+            System.out.println("Please input user name, surname,email");
+            String usertDataStr = scanner.nextLine();
+            String[] usertData = usertDataStr.split(",");
+            User user = User.builder()
+                    .name(usertData[0])
+                    .surname(usertData[1])
+                    .email(usertData[2])
+                    .event(event)
 
-        User user = new User(username, usersurname, useremail, eventid);
-        UserManager userManager = new UserManager();
-        userManager.add(user);
-
-    }
-
-    private static void showAllEvents() throws SQLException {
-        EventManager eventManager = new EventManager();
-        eventManager.showAllEvents();
-    }
-
-    private static void addEvent() throws SQLException {
-        boolean isOnline;
-
-        System.out.println("Please input event name");
-        String eventname = scanner.nextLine();
-        System.out.println("Please input event place");
-        String eventplace = scanner.nextLine();
-        System.out.println("Please input event price");
-        double price = Double.parseDouble(scanner.nextLine());
-        System.out.println("Please input event activity (DD.MM.YYYY)");
-        String eventactivity = scanner.nextLine();
-        isOnline = Objects.requireNonNull(stringToDate(eventactivity)).after(new Date());
-        System.out.println("Please choose event type");
-        Command.eventTypeCommand();
-        int command1;
-        EventType eventType = EVENT_NOT_FOUND;
-        try {
-            command1 = Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            command1 = -1;
+                    .build();
+            userManager.add(user);
+            System.out.println("User added");
         }
-        switch (command1) {
-            case CONCERT -> eventType = EventType.CONCERT;
-            case EXHIBITION -> eventType = EventType.EXHIBITION;
-            case KINO -> eventType = EventType.KINO;
-
-            default -> System.out.println("Event type not found");
-        }
-
-        Event event = new Event(eventname, eventplace, price, isOnline, eventType);
-        EventManager eventManager = new EventManager();
-        eventManager.add(event);
-        System.out.println("Event created");
     }
-
-
 }
 
 

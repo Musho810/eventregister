@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class DBConnectionProvider {
 
-    private static DBConnectionProvider instance = new DBConnectionProvider();
+    private final static DBConnectionProvider INSTANCE = new DBConnectionProvider();
 
     private Connection connection;
 
@@ -16,16 +16,16 @@ public class DBConnectionProvider {
     private final String PASSWORD = "root";
 
     private DBConnectionProvider() {
-        try {
-            Class.forName(DRIVERNAME);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
+//        try {
+//            Class.forName(DRIVERNAME);
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//
     }
 
     public static DBConnectionProvider getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     public Connection getConnection() {

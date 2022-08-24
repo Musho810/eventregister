@@ -2,13 +2,16 @@ package model;
 
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
+@Builder
 
 public class Event {
 
@@ -17,15 +20,8 @@ public class Event {
     private String place;
     private double price;
     private boolean isOnline;
-
     private EventType eventType;
+private Date eventDate;
 
 
-    public Event(String name, String place, double price, boolean isOnline, EventType eventType) {
-        this.name = name;
-        this.place = place;
-        this.price = price;
-        this.isOnline = isOnline;
-        this.eventType = eventType;
-    }
 }

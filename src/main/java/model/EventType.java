@@ -2,9 +2,9 @@ package model;
 
 public enum EventType {
 
-    CONCERT,
-    EXHIBITION,
-    KINO,
+    FILM    ,
+    SPORT,
+    GAME ,
 
-    EVENT_NOT_FOUND
+
 }
