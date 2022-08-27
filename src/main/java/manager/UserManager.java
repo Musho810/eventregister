@@ -2,12 +2,9 @@ package manager;
 
 import db.DBConnectionProvider;
 import model.Event;
-
 import model.User;
-
 import java.sql.*;
 import java.util.ArrayList;
-
 import java.util.List;
 
 public class UserManager {

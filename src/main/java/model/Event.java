@@ -21,7 +21,7 @@ public class Event {
     private double price;
     private boolean isOnline;
     private EventType eventType;
-private Date eventDate;
+    private Date eventDate;
 
 
 }

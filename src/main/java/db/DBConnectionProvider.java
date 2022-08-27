@@ -10,18 +10,12 @@ public class DBConnectionProvider {
 
     private Connection connection;
 
-    private final String DRIVERNAME = "com.mysql.cj.jdbc.Driver";
     private final String DB_URL = "jdbc:mysql://localhost:3306/event_register";
     private final String USERNAME = "root";
     private final String PASSWORD = "root";
 
     private DBConnectionProvider() {
-//        try {
-//            Class.forName(DRIVERNAME);
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//
+
     }
 
     public static DBConnectionProvider getInstance() {
